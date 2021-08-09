@@ -44,10 +44,16 @@ public class GPDispatcherServlet extends HttpServlet {
 
     private List<GPViewResolver> viewResolvers = new ArrayList<GPViewResolver>();
 
+
+    /**
+     * 核心方法,一启动项目就会执行这个方法
+     * @param config
+     * @throws ServletException
+     */
     @Override
     public void init(ServletConfig config) throws ServletException {
 
-        //相当于把IOC容器初始化了
+        //调用构造方法.相当于把IOC容器初始化了  定位,加载,注册,注入
         GPApplicationContext context = new GPApplicationContext(config.getInitParameter(LOCATION));
 
 
@@ -181,8 +187,6 @@ public class GPDispatcherServlet extends HttpServlet {
                     paramMapping.put(type.getName(),i);
                 }
             }
-
-
             this.handlerAdapters.put(handlerMapping,new GPHandlerAdapter(paramMapping));
         }
 
@@ -193,13 +197,10 @@ public class GPDispatcherServlet extends HttpServlet {
         //解决页面名字和模板文件关联的问题
         String templateRoot = context.getConfig().getProperty("templateRoot");
         String templateRootPath = this.getClass().getClassLoader().getResource(templateRoot).getFile();
-
         File templateRootDir = new File(templateRootPath);
-
         for (File template : templateRootDir.listFiles()) {
             this.viewResolvers.add(new GPViewResolver(template.getName(),template));
         }
-
     }
 
 

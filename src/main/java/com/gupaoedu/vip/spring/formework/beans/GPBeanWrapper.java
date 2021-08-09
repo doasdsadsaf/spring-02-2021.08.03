@@ -24,7 +24,7 @@ public class GPBeanWrapper extends GPFactoryBean {
     //还会用到  观察者  模式
     //1、支持事件响应，会有一个监听
     private GPBeanPostProcessor postProcessor;
-
+    // 增强后的类
     private Object wrapperInstance;
     //原始的通过反射new出来，要把包装起来，存下来
     private Object originalInstance;
@@ -32,6 +32,7 @@ public class GPBeanWrapper extends GPFactoryBean {
     public GPBeanWrapper(Object instance){
         //从这里开始，我们要把动态的代码添加进来了
         this.wrapperInstance = aopProxy.getProxy(instance);
+        // 存储原生实例对象
         this.originalInstance = instance;
     }
 

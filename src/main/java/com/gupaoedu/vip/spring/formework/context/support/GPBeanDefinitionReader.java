@@ -18,31 +18,32 @@ import java.util.Properties;
 public class GPBeanDefinitionReader {
 
     private  Properties config = new Properties();
-
+    // 存储扫描类全路径
     private List<String> registyBeanClasses = new ArrayList<String>();
 
 
-    //在配置文件中，用来获取自动扫描的包名的key
+    //在配置文件中，用来获取自动扫描的包名的key 配置文件里的名字跟这个要一致
     private final String SCAN_PACKAGE = "scanPackage";
 
     public GPBeanDefinitionReader(String... locations){
-        //在Spring中是通过Reader去查找和定位对不对
+        //在Spring中是通过Reader去查找和定位配置文件 application.properties
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(locations[0].replace("classpath:",""));
 
         try {
+            // config 读取流
             config.load(is);
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
             try {
-                if(null != is){is.close();}
+                 if(null != is){is.close();}
             }catch (Exception e){
                 e.printStackTrace();
             }
 
         }
-
-        doScanner(config.getProperty(SCAN_PACKAGE));
+            // 根据配置文件的key 拿到value
+             doScanner(config.getProperty(SCAN_PACKAGE));
 
     }
 
@@ -53,9 +54,12 @@ public class GPBeanDefinitionReader {
     //每注册一个className，就返回一个BeanDefinition，我自己包装
     //只是为了对配置信息进行一个包装
     public GPBeanDefinition registerBean(String className){
+        // 判断是否有这个全路径
         if(this.registyBeanClasses.contains(className)){
             GPBeanDefinition beanDefinition = new GPBeanDefinition();
+            // 有的话保存全路径
             beanDefinition.setBeanClassName(className);
+            // 保存名字
             beanDefinition.setFactoryBeanName(lowerFirstCase(className.substring(className.lastIndexOf(".") + 1)));
             return beanDefinition;
         }
@@ -66,15 +70,17 @@ public class GPBeanDefinitionReader {
 
     //递归扫描所有的相关联的class，并且保存到一个List中
     private void doScanner(String packageName) {
-
+        // 把. 转成/  .需要转义为\\. 拿到需要注册的全路径
         URL url = this.getClass().getClassLoader().getResource("/" + packageName.replaceAll("\\.","/"));
-
+        // 根据全路径拿到下面的所有文件夹
         File classDir = new File(url.getFile());
-
+        // 遍历所有文件夹
         for (File file : classDir.listFiles()){
+            // 判断如果是文件夹,递归调用
             if(file.isDirectory()){
                 doScanner(packageName + "." +file.getName());
             }else {
+                // 不是文件夹 保存类的全路径 到list
                 registyBeanClasses.add(packageName + "." + file.getName().replace(".class",""));
             }
         }

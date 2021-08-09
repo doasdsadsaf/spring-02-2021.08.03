@@ -7,9 +7,10 @@ package com.gupaoedu.vip.spring.formework.beans;
 //用来存储配置文件中的信息
 //相当于保存在内存中的配置
 public class GPBeanDefinition {
-
+    // 存储类全路径
     private String beanClassName;
     private boolean lazyInit = false;
+    // 存储类的对象名
     private String factoryBeanName;
 
     public String getBeanClassName() {
